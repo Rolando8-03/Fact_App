@@ -2,6 +2,8 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.*?>
 
 <BorderPane xmlns="http://javafx.com/javafx"
@@ -76,7 +78,23 @@
 
                     <Button fx:id="btnSalir"
                             text="Salir"
-                            onAction="#salir"/>
+                            onAction="#salir">
+
+                        <graphic>
+
+                            <ImageView fitWidth="18"
+                                       fitHeight="18"
+                                       preserveRatio="true">
+
+                                <image>
+                                    <Image url="@../icons/cerrar.png"/>
+                                </image>
+
+                            </ImageView>
+
+                        </graphic>
+
+                    </Button>
 
                 </items>
 
@@ -88,7 +106,8 @@
 
     <center>
 
-        <StackPane>
+        <VBox spacing="15"
+              alignment="CENTER">
 
             <padding>
                 <Insets top="20"
@@ -97,17 +116,22 @@
                         left="20"/>
             </padding>
 
-            <VBox spacing="10"
-                  alignment="CENTER">
+            <ImageView fitWidth="160"
+                       fitHeight="160"
+                       preserveRatio="true">
 
-                <Label text="Sistema de Facturación"
-                       style="-fx-font-size: 28px; -fx-font-weight: bold;"/>
+                <image>
+                    <Image url="@../images/logo.png"/>
+                </image>
 
-                <Label text="Seleccione un módulo para comenzar"/>
+            </ImageView>
 
-            </VBox>
+            <Label text="Sistema de Facturación"
+                   style="-fx-font-size: 28px; -fx-font-weight: bold;"/>
 
-        </StackPane>
+            <Label text="Seleccione un módulo para comenzar"/>
+
+        </VBox>
 
     </center>
 

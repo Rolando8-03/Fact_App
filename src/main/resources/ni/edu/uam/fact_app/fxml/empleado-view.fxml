@@ -2,6 +2,8 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.*?>
 
 <BorderPane xmlns="http://javafx.com/javafx"
@@ -93,13 +95,37 @@
                   alignment="CENTER_RIGHT">
 
                 <Button text="Guardar"
-                        onAction="#guardar"/>
+                        onAction="#guardar">
+
+                    <graphic>
+                        <ImageView fitWidth="18"
+                                   fitHeight="18"
+                                   preserveRatio="true">
+                            <image>
+                                <Image url="@../icons/agregar.png"/>
+                            </image>
+                        </ImageView>
+                    </graphic>
+
+                </Button>
 
                 <Button text="Limpiar"
                         onAction="#limpiar"/>
 
                 <Button text="Cerrar"
-                        onAction="#cerrar"/>
+                        onAction="#cerrar">
+
+                    <graphic>
+                        <ImageView fitWidth="18"
+                                   fitHeight="18"
+                                   preserveRatio="true">
+                            <image>
+                                <Image url="@../icons/cerrar.png"/>
+                            </image>
+                        </ImageView>
+                    </graphic>
+
+                </Button>
 
             </HBox>
 
