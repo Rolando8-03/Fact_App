@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="ni.edu.uam.fact_app.controller.CategoriaController"
+            prefWidth="650.0"
+            prefHeight="500.0">
+
+    <top>
+
+        <Label text="Gestión de categorías"
+               BorderPane.alignment="CENTER"
+               style="-fx-font-size: 22px; -fx-font-weight: bold;">
+
+            <padding>
+                <Insets top="15"
+                        right="10"
+                        bottom="15"
+                        left="10"/>
+            </padding>
+
+        </Label>
+
+    </top>
+
+    <center>
+
+        <VBox spacing="15">
+
+            <padding>
+                <Insets top="15"
+                        right="20"
+                        bottom="20"
+                        left="20"/>
+            </padding>
+
+            <GridPane hgap="10"
+                      vgap="12">
+
+                <Label text="Nombre:"
+                       GridPane.columnIndex="0"
+                       GridPane.rowIndex="0"/>
+
+                <TextField fx:id="txtNombre"
+                           promptText="Nombre de la categoría"
+                           prefWidth="300"
+                           GridPane.columnIndex="1"
+                           GridPane.rowIndex="0"/>
+
+                <Label text="Estado:"
+                       GridPane.columnIndex="0"
+                       GridPane.rowIndex="1"/>
+
+                <CheckBox fx:id="chkActiva"
+                          text="Categoría activa"
+                          GridPane.columnIndex="1"
+                          GridPane.rowIndex="1"/>
+
+            </GridPane>
+
+            <HBox spacing="10"
+                  alignment="CENTER_RIGHT">
+
+                <Button text="Guardar"
+                        onAction="#guardar"/>
+
+                <Button text="Limpiar"
+                        onAction="#limpiar"/>
+
+                <Button text="Cerrar"
+                        onAction="#cerrar"/>
+
+            </HBox>
+
+            <TableView fx:id="tblCategorias"
+                       VBox.vgrow="ALWAYS">
+
+                <columns>
+
+                    <TableColumn fx:id="colNombre"
+                                 text="Nombre"
+                                 prefWidth="350"/>
+
+                    <TableColumn fx:id="colActiva"
+                                 text="Activa"
+                                 prefWidth="180"/>
+
+                </columns>
+
+            </TableView>
+
+        </VBox>
+
+    </center>
+
+</BorderPane>
