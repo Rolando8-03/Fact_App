@@ -1,14 +1,139 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane xmlns="http://javafx.com/javafx"
+<BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
-            fx:controller="CONTROLLER_NAME"
-            prefHeight="400.0" prefWidth="600.0">
+            fx:controller="ni.edu.uam.fact_app.controller.EmpleadoController"
+            prefWidth="800.0"
+            prefHeight="600.0">
 
-</AnchorPane>
+    <top>
+
+        <Label text="Gestión de empleados"
+               BorderPane.alignment="CENTER"
+               style="-fx-font-size: 22px; -fx-font-weight: bold;">
+
+            <padding>
+                <Insets top="15"
+                        right="10"
+                        bottom="15"
+                        left="10"/>
+            </padding>
+
+        </Label>
+
+    </top>
+
+    <center>
+
+        <VBox spacing="15">
+
+            <padding>
+                <Insets top="15"
+                        right="20"
+                        bottom="20"
+                        left="20"/>
+            </padding>
+
+            <GridPane hgap="10"
+                      vgap="12">
+
+                <Label text="Nombres:"
+                       GridPane.columnIndex="0"
+                       GridPane.rowIndex="0"/>
+
+                <TextField fx:id="txtNombres"
+                           promptText="Nombres del empleado"
+                           prefWidth="300"
+                           GridPane.columnIndex="1"
+                           GridPane.rowIndex="0"/>
+
+                <Label text="Apellidos:"
+                       GridPane.columnIndex="0"
+                       GridPane.rowIndex="1"/>
+
+                <TextField fx:id="txtApellidos"
+                           promptText="Apellidos del empleado"
+                           GridPane.columnIndex="1"
+                           GridPane.rowIndex="1"/>
+
+                <Label text="Cargo:"
+                       GridPane.columnIndex="0"
+                       GridPane.rowIndex="2"/>
+
+                <ComboBox fx:id="cmbCargo"
+                          prefWidth="300"
+                          GridPane.columnIndex="1"
+                          GridPane.rowIndex="2"/>
+
+                <Label text="Fecha de contratación:"
+                       GridPane.columnIndex="0"
+                       GridPane.rowIndex="3"/>
+
+                <DatePicker fx:id="dpFechaContratacion"
+                            prefWidth="300"
+                            GridPane.columnIndex="1"
+                            GridPane.rowIndex="3"/>
+
+                <Label text="Estado:"
+                       GridPane.columnIndex="0"
+                       GridPane.rowIndex="4"/>
+
+                <CheckBox fx:id="chkActivo"
+                          text="Empleado activo"
+                          GridPane.columnIndex="1"
+                          GridPane.rowIndex="4"/>
+
+            </GridPane>
+
+            <HBox spacing="10"
+                  alignment="CENTER_RIGHT">
+
+                <Button text="Guardar"
+                        onAction="#guardar"/>
+
+                <Button text="Limpiar"
+                        onAction="#limpiar"/>
+
+                <Button text="Cerrar"
+                        onAction="#cerrar"/>
+
+            </HBox>
+
+            <TableView fx:id="tblEmpleados"
+                       VBox.vgrow="ALWAYS">
+
+                <columns>
+
+                    <TableColumn fx:id="colNombres"
+                                 text="Nombres"
+                                 prefWidth="150"/>
+
+                    <TableColumn fx:id="colApellidos"
+                                 text="Apellidos"
+                                 prefWidth="150"/>
+
+                    <TableColumn fx:id="colCargo"
+                                 text="Cargo"
+                                 prefWidth="140"/>
+
+                    <TableColumn fx:id="colFecha"
+                                 text="Fecha contratación"
+                                 prefWidth="170"/>
+
+                    <TableColumn fx:id="colActivo"
+                                 text="Activo"
+                                 prefWidth="100"/>
+
+                </columns>
+
+            </TableView>
+
+        </VBox>
+
+    </center>
+
+</BorderPane>
