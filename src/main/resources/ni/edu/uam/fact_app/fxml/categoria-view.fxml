@@ -1,121 +1,125 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
+<?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
-<?import javafx.scene.image.Image?>
-<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="ni.edu.uam.fact_app.controller.CategoriaController"
-            prefWidth="650.0"
-            prefHeight="500.0">
+<BorderPane prefHeight="450.0" prefWidth="650.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ni.edu.uam.fact_app.controller.CategoriaController">
 
+    <!-- TÍTULO -->
     <top>
 
-        <Label text="Gestión de categorías"
-               BorderPane.alignment="CENTER"
-               style="-fx-font-size: 22px; -fx-font-weight: bold;">
+        <Label style="-fx-font-size: 22px;                       -fx-font-weight: bold;" text="Gestión de categorías" BorderPane.alignment="CENTER">
 
             <padding>
-                <Insets top="15"
-                        right="10"
-                        bottom="15"
-                        left="10"/>
+
+                <Insets bottom="15" left="10" right="10" top="15" />
+
             </padding>
 
         </Label>
 
     </top>
 
+
+    <!-- CONTENIDO -->
     <center>
 
         <VBox spacing="15">
 
             <padding>
-                <Insets top="15"
-                        right="20"
-                        bottom="20"
-                        left="20"/>
+
+                <Insets bottom="20" left="25" right="25" top="15" />
+
             </padding>
 
-            <GridPane hgap="10"
-                      vgap="12">
 
-                <Label text="Nombre:"
-                       GridPane.columnIndex="0"
-                       GridPane.rowIndex="0"/>
+            <!--
+                DATOS PRINCIPALES EN UNA SOLA FILA
+                PARA APROVECHAR MEJOR EL ESPACIO
+            -->
+            <HBox alignment="CENTER_LEFT" spacing="25">
 
-                <TextField fx:id="txtNombre"
-                           promptText="Nombre de la categoría"
-                           prefWidth="300"
-                           GridPane.columnIndex="1"
-                           GridPane.rowIndex="0"/>
 
-                <Label text="Estado:"
-                       GridPane.columnIndex="0"
-                       GridPane.rowIndex="1"/>
+                <!-- NOMBRE -->
+                <HBox alignment="CENTER_LEFT" spacing="10" HBox.hgrow="ALWAYS">
 
-                <CheckBox fx:id="chkActiva"
-                          text="Categoría activa"
-                          GridPane.columnIndex="1"
-                          GridPane.rowIndex="1"/>
+                    <Label text="Nombre *:" />
 
-            </GridPane>
+                    <TextField fx:id="txtNombre" prefWidth="300" promptText="Nombre de la categoría" HBox.hgrow="ALWAYS" />
 
-            <HBox spacing="10"
-                  alignment="CENTER_RIGHT">
+                </HBox>
 
-                <Button text="Guardar"
-                        onAction="#guardar">
+
+                <!-- ESTADO -->
+                <HBox alignment="CENTER_LEFT" spacing="10">
+
+                    <Label text="Estado:" />
+
+                    <CheckBox fx:id="chkActiva" text="Categoría activa" />
+
+                </HBox>
+
+            </HBox>
+
+
+            <!--
+                CAMPOS OBLIGATORIOS + FILTRO + GUARDAR
+            -->
+            <HBox alignment="CENTER_LEFT" spacing="20">
+
+
+                <Label style="-fx-text-fill: #b00020;" text="* Campos obligatorios" />
+
+
+                <CheckBox fx:id="chkVerTodos" onAction="#filtrarCategorias" selected="true" text="Ver todos" />
+
+
+                <Region HBox.hgrow="ALWAYS" />
+
+
+                <Button fx:id="btnGuardar" onAction="#guardar" text="Guardar">
+
 
                     <graphic>
-                        <ImageView fitWidth="18"
-                                   fitHeight="18"
-                                   preserveRatio="true">
+
+                        <ImageView fitHeight="18" fitWidth="18" preserveRatio="true">
+
                             <image>
-                                <Image url="@../icons/agregar.png"/>
+
+                                <Image url="@../icons/agregar.png" />
+
                             </image>
+
                         </ImageView>
-                    </graphic>
 
-                </Button>
-
-                <Button text="Limpiar"
-                        onAction="#limpiar"/>
-
-                <Button text="Cerrar"
-                        onAction="#cerrar">
-
-                    <graphic>
-                        <ImageView fitWidth="18"
-                                   fitHeight="18"
-                                   preserveRatio="true">
-                            <image>
-                                <Image url="@../icons/cerrar.png"/>
-                            </image>
-                        </ImageView>
                     </graphic>
 
                 </Button>
 
             </HBox>
 
-            <TableView fx:id="tblCategorias"
-                       VBox.vgrow="ALWAYS">
+
+            <!-- TABLA -->
+            <TableView fx:id="tblCategorias" VBox.vgrow="ALWAYS">
+
 
                 <columns>
 
-                    <TableColumn fx:id="colNombre"
-                                 text="Nombre"
-                                 prefWidth="350"/>
+                    <TableColumn fx:id="colNombre" prefWidth="430" text="Nombre" />
 
-                    <TableColumn fx:id="colActiva"
-                                 text="Activa"
-                                 prefWidth="180"/>
+
+                    <!--
+                        ESTA COLUMNA SE MANTIENE,
+                        TAL COMO PEDISTE.
+                    -->
+                    <TableColumn fx:id="colActiva" prefWidth="160" text="Activa" />
 
                 </columns>
+            <columnResizePolicy>
+               <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+            </columnResizePolicy>
 
             </TableView>
 
