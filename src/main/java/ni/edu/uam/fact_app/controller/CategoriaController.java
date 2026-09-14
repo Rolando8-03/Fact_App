@@ -27,9 +27,6 @@ public class CategoriaController {
     @FXML
     private TableColumn<Categoria, String> colNombre;
 
-    @FXML
-    private TableColumn<Categoria, Boolean> colActiva;
-
 
     /*
      * CRUD encargado de almacenar las categorías.
@@ -64,17 +61,6 @@ public class CategoriaController {
                 )
         );
 
-
-        colActiva.setCellValueFactory(
-                new PropertyValueFactory<>(
-                        "activa"
-                )
-        );
-
-
-        /*
-         * La tabla muestra la lista filtrada.
-         */
         tblCategorias.setItems(
                 categoriasMostradas
         );
