@@ -79,10 +79,6 @@ public class CategoriaController {
                 categoriasMostradas
         );
 
-
-        /*
-         * Mensaje en español cuando no hay datos.
-         */
         tblCategorias.setPlaceholder(
                 new Label(
                         "No hay categorías para mostrar."
@@ -165,24 +161,12 @@ public class CategoriaController {
     }
 
 
-    /*
-     * Se ejecuta al marcar o desmarcar
-     * la opción Ver todos.
-     */
     @FXML
     private void filtrarCategorias() {
 
         actualizarTabla();
     }
 
-
-    /*
-     * Ver todos marcado:
-     * muestra activas e inactivas.
-     *
-     * Ver todos desmarcado:
-     * muestra solamente categorías activas.
-     */
     private void actualizarTabla() {
 
         categoriasMostradas.clear();
@@ -209,12 +193,6 @@ public class CategoriaController {
     }
 
 
-    /*
-     * Se limpia automáticamente después
-     * de guardar correctamente.
-     *
-     * No existe botón Limpiar.
-     */
     private void limpiarCampos() {
 
         txtNombre.clear();

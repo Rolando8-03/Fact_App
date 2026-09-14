@@ -11,6 +11,7 @@ import javafx.stage.FileChooser;
 
 import ni.edu.uam.fact_app.model.Categoria;
 import ni.edu.uam.fact_app.model.Producto;
+import ni.edu.uam.fact_app.util.CategoriaCrud;
 import ni.edu.uam.fact_app.util.Crud;
 import ni.edu.uam.fact_app.util.ProductoCrud;
 
@@ -61,131 +62,62 @@ public class ProductoController {
     @FXML
     private TableColumn<Producto, Integer> colExistencia;
 
-
-    /*
-     * CRUD encargado de almacenar los productos.
-     */
     private final Crud<Producto> productoCrud =
             new ProductoCrud();
 
+    private final Crud<Categoria> categoriaCrud =
+            new CategoriaCrud();
 
-    /*
-     * Lista con todos los productos almacenados.
-     *
-     * ProductoCrud conserva esta lista aunque
-     * se cierre y vuelva a abrir la ventana.
-     */
     private final ObservableList<Producto> productos =
             productoCrud.listar();
 
-
-    /*
-     * Lista que se muestra actualmente
-     * en el TableView.
-     */
     private final ObservableList<Producto> productosMostrados =
             FXCollections.observableArrayList();
 
-
     private String rutaImagen;
-
 
     @FXML
     private void initialize() {
 
-        /*
-         * Categorías temporales.
-         */
         cmbCategoria.setItems(
-                FXCollections.observableArrayList(
-
-                        new Categoria(
-                                1,
-                                "Alimentos",
-                                true
-                        ),
-
-                        new Categoria(
-                                2,
-                                "Bebidas",
-                                true
-                        ),
-
-                        new Categoria(
-                                3,
-                                "Limpieza",
-                                true
-                        )
-                )
+                categoriaCrud.listar()
         );
 
-
-        /*
-         * Configuración de columnas.
-         */
         colCodigo.setCellValueFactory(
-                new PropertyValueFactory<>(
-                        "codigo"
-                )
+                new PropertyValueFactory<>("codigo")
         );
 
         colNombre.setCellValueFactory(
-                new PropertyValueFactory<>(
-                        "nombre"
-                )
+                new PropertyValueFactory<>("nombre")
         );
 
         colCategoria.setCellValueFactory(
-                new PropertyValueFactory<>(
-                        "categoria"
-                )
+                new PropertyValueFactory<>("categoria")
         );
 
         colPrecio.setCellValueFactory(
-                new PropertyValueFactory<>(
-                        "precioVenta"
-                )
+                new PropertyValueFactory<>("precioVenta")
         );
 
         colExistencia.setCellValueFactory(
-                new PropertyValueFactory<>(
-                        "existencia"
-                )
+                new PropertyValueFactory<>("existencia")
         );
 
-
-        /*
-         * Configurar tabla.
-         */
         tblProductos.setItems(
                 productosMostrados
         );
 
-
-        /*
-         * Mensaje cuando la tabla esté vacía.
-         */
         tblProductos.setPlaceholder(
                 new Label(
                         "No hay productos para mostrar."
                 )
         );
 
-
-        /*
-         * Valores iniciales.
-         */
         chkActivo.setSelected(true);
-
         chkVerTodos.setSelected(true);
 
-
-        /*
-         * Mostrar productos existentes.
-         */
         actualizarTabla();
     }
-
 
     @FXML
     private void seleccionarImagen() {
@@ -193,53 +125,36 @@ public class ProductoController {
         FileChooser chooser =
                 new FileChooser();
 
-
-        chooser
-                .getExtensionFilters()
-                .add(
-
-                        new FileChooser.ExtensionFilter(
-                                "Imágenes",
-                                "*.png",
-                                "*.jpg",
-                                "*.jpeg"
-                        )
-                );
-
+        chooser.getExtensionFilters().add(
+                new FileChooser.ExtensionFilter(
+                        "Imágenes",
+                        "*.png",
+                        "*.jpg",
+                        "*.jpeg"
+                )
+        );
 
         File archivo =
                 chooser.showOpenDialog(
-
                         txtCodigo
                                 .getScene()
                                 .getWindow()
                 );
 
-
         if (archivo != null) {
 
             rutaImagen =
-                    archivo
-                            .toURI()
-                            .toString();
-
+                    archivo.toURI().toString();
 
             imgProducto.setImage(
-
-                    new Image(
-                            rutaImagen
-                    )
+                    new Image(rutaImagen)
             );
         }
     }
 
-
     @FXML
     private void guardar() {
 
-        /*
-         * Validar campos obligatorios.
-         */
         if (txtCodigo.getText().isBlank()
                 || txtNombre.getText().isBlank()
                 || txtPrecio.getText().isBlank()
@@ -254,30 +169,22 @@ public class ProductoController {
             return;
         }
 
-
         try {
 
             BigDecimal precio =
                     new BigDecimal(
-
                             txtPrecio
                                     .getText()
                                     .trim()
                     );
 
-
             int existencia =
                     Integer.parseInt(
-
                             txtExistencia
                                     .getText()
                                     .trim()
                     );
 
-
-            /*
-             * Validar precio.
-             */
             if (precio.signum() <= 0) {
 
                 mensaje(
@@ -288,10 +195,6 @@ public class ProductoController {
                 return;
             }
 
-
-            /*
-             * Validar existencia.
-             */
             if (existencia < 0) {
 
                 mensaje(
@@ -302,59 +205,34 @@ public class ProductoController {
                 return;
             }
 
-
-            /*
-             * Crear producto.
-             */
             Producto producto =
                     new Producto(
-
                             null,
-
                             txtCodigo
                                     .getText()
                                     .trim(),
-
                             txtNombre
                                     .getText()
                                     .trim(),
-
-                            cmbCategoria
-                                    .getValue(),
-
+                            cmbCategoria.getValue(),
                             precio,
-
                             existencia,
-
                             rutaImagen,
-
-                            chkActivo
-                                    .isSelected()
+                            chkActivo.isSelected()
                     );
 
-
-            /*
-             * Guardar mediante CRUD.
-             */
             productoCrud.guardar(
                     producto
             );
 
-
-            /*
-             * Refrescar tabla.
-             */
             actualizarTabla();
-
 
             mensaje(
                     Alert.AlertType.INFORMATION,
                     "Producto agregado correctamente."
             );
 
-
             limpiar();
-
 
         } catch (NumberFormatException e) {
 
@@ -365,30 +243,16 @@ public class ProductoController {
         }
     }
 
-
-    /*
-     * Se ejecuta cuando cambia
-     * el CheckBox "Ver todos".
-     */
     @FXML
     private void filtrarProductos() {
 
         actualizarTabla();
     }
 
-
-    /*
-     * Mostrar todos o solamente
-     * los productos activos.
-     */
     private void actualizarTabla() {
 
         productosMostrados.clear();
 
-
-        /*
-         * Ver todos.
-         */
         if (chkVerTodos.isSelected()) {
 
             productosMostrados.addAll(
@@ -397,9 +261,6 @@ public class ProductoController {
 
         } else {
 
-            /*
-             * Mostrar solamente activos.
-             */
             for (Producto producto : productos) {
 
                 if (producto.isActivo()) {
@@ -412,39 +273,26 @@ public class ProductoController {
         }
     }
 
-
     private void limpiar() {
 
         txtCodigo.clear();
-
         txtNombre.clear();
-
         txtPrecio.clear();
-
         txtExistencia.clear();
-
 
         cmbCategoria
                 .getSelectionModel()
                 .clearSelection();
 
-
         chkActivo.setSelected(true);
-
 
         imgProducto.setImage(null);
 
-
         rutaImagen = null;
-
 
         txtCodigo.requestFocus();
     }
 
-
-    /*
-     * Alertas en español.
-     */
     private void mensaje(
             Alert.AlertType tipo,
             String texto
@@ -455,7 +303,6 @@ public class ProductoController {
                         "Aceptar"
                 );
 
-
         Alert alerta =
                 new Alert(
                         tipo,
@@ -463,23 +310,19 @@ public class ProductoController {
                         aceptar
                 );
 
-
-        if (tipo ==
-                Alert.AlertType.WARNING) {
+        if (tipo == Alert.AlertType.WARNING) {
 
             alerta.setTitle(
                     "Advertencia"
             );
 
-        } else if (tipo ==
-                Alert.AlertType.ERROR) {
+        } else if (tipo == Alert.AlertType.ERROR) {
 
             alerta.setTitle(
                     "Error"
             );
 
-        } else if (tipo ==
-                Alert.AlertType.INFORMATION) {
+        } else if (tipo == Alert.AlertType.INFORMATION) {
 
             alerta.setTitle(
                     "Información"
@@ -492,9 +335,7 @@ public class ProductoController {
             );
         }
 
-
         alerta.setHeaderText(null);
-
 
         alerta.showAndWait();
     }
