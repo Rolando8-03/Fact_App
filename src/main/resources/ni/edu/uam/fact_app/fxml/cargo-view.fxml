@@ -1,120 +1,112 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
+<?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
-<?import javafx.scene.image.Image?>
-<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="ni.edu.uam.fact_app.controller.CargoController"
-            prefWidth="650.0"
-            prefHeight="500.0">
+<BorderPane prefHeight="500.0" prefWidth="650.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ni.edu.uam.fact_app.controller.CargoController">
 
+    <!-- TÍTULO -->
     <top>
 
-        <Label text="Gestión de cargos"
-               BorderPane.alignment="CENTER"
-               style="-fx-font-size: 22px; -fx-font-weight: bold;">
+        <Label style="-fx-font-size: 22px;                       -fx-font-weight: bold;" text="Gestión de cargos" BorderPane.alignment="CENTER">
 
             <padding>
-                <Insets top="15"
-                        right="10"
-                        bottom="15"
-                        left="10"/>
+
+                <Insets bottom="15" left="10" right="10" top="15" />
+
             </padding>
 
         </Label>
 
     </top>
 
+
+    <!-- CONTENIDO -->
     <center>
 
         <VBox spacing="15">
 
             <padding>
-                <Insets top="15"
-                        right="20"
-                        bottom="20"
-                        left="20"/>
+
+                <Insets bottom="20" left="20" right="20" top="15" />
+
             </padding>
 
-            <GridPane hgap="10"
-                      vgap="12">
 
-                <Label text="Nombre:"
-                       GridPane.columnIndex="0"
-                       GridPane.rowIndex="0"/>
+            <!-- FORMULARIO -->
+            <GridPane hgap="10" prefHeight="65.0" prefWidth="542.0" vgap="12">
 
-                <TextField fx:id="txtNombre"
-                           promptText="Nombre del cargo"
-                           prefWidth="350"
-                           GridPane.columnIndex="1"
-                           GridPane.rowIndex="0"/>
 
-                <Label text="Descripción:"
-                       GridPane.columnIndex="0"
-                       GridPane.rowIndex="1"/>
+                <columnConstraints>
 
-                <TextField fx:id="txtDescripcion"
-                           promptText="Descripción del cargo"
-                           prefWidth="350"
-                           GridPane.columnIndex="1"
-                           GridPane.rowIndex="1"/>
+                    <ColumnConstraints minWidth="85" prefWidth="85" />
+
+                    <ColumnConstraints hgrow="ALWAYS" minWidth="350" prefWidth="350" />
+
+                </columnConstraints>
+
+
+                <!-- NOMBRE -->
+                <Label text="Nombre *:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+
+                <TextField fx:id="txtNombre" promptText="Nombre del cargo" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+
+
+                <!-- DESCRIPCIÓN -->
+                <Label text="Descripción *:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+
+                <TextField fx:id="txtDescripcion" promptText="Descripción del cargo" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <rowConstraints>
+               <RowConstraints />
+               <RowConstraints />
+            </rowConstraints>
 
             </GridPane>
 
-            <HBox spacing="10"
-                  alignment="CENTER_RIGHT">
 
-                <Button text="Guardar"
-                        onAction="#guardar">
+            <!-- CAMPOS OBLIGATORIOS + GUARDAR -->
+            <HBox alignment="CENTER_LEFT" spacing="15">
 
-                    <graphic>
-                        <ImageView fitWidth="18"
-                                   fitHeight="18"
-                                   preserveRatio="true">
-                            <image>
-                                <Image url="@../icons/agregar.png"/>
-                            </image>
-                        </ImageView>
-                    </graphic>
 
-                </Button>
+                <Label style="-fx-text-fill: #b00020;" text="* Campos obligatorios" />
 
-                <Button text="Limpiar"
-                        onAction="#limpiar"/>
 
-                <Button text="Cerrar"
-                        onAction="#cerrar">
+                <Region HBox.hgrow="ALWAYS" />
+
+
+                <Button fx:id="btnGuardar" onAction="#guardar" text="Guardar">
+
 
                     <graphic>
-                        <ImageView fitWidth="18"
-                                   fitHeight="18"
-                                   preserveRatio="true">
+
+                        <ImageView fitHeight="18" fitWidth="18" preserveRatio="true">
+
                             <image>
-                                <Image url="@../icons/cerrar.png"/>
+
+                                <Image url="@../icons/agregar.png" />
+
                             </image>
+
                         </ImageView>
+
                     </graphic>
 
                 </Button>
 
             </HBox>
 
-            <TableView fx:id="tblCargos"
-                       VBox.vgrow="ALWAYS">
+
+            <!-- TABLA -->
+            <TableView fx:id="tblCargos" VBox.vgrow="ALWAYS">
+
 
                 <columns>
 
-                    <TableColumn fx:id="colNombre"
-                                 text="Nombre"
-                                 prefWidth="220"/>
+                    <TableColumn fx:id="colNombre" prefWidth="240" text="Nombre" />
 
-                    <TableColumn fx:id="colDescripcion"
-                                 text="Descripción"
-                                 prefWidth="350"/>
+                    <TableColumn fx:id="colDescripcion" prefWidth="365" text="Descripción" />
 
                 </columns>
 
