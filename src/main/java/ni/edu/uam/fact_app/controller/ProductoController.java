@@ -11,6 +11,8 @@ import javafx.stage.FileChooser;
 
 import ni.edu.uam.fact_app.model.Categoria;
 import ni.edu.uam.fact_app.model.Producto;
+import ni.edu.uam.fact_app.util.Crud;
+import ni.edu.uam.fact_app.util.ProductoCrud;
 
 import java.io.File;
 import java.math.BigDecimal;
@@ -59,16 +61,28 @@ public class ProductoController {
     @FXML
     private TableColumn<Producto, Integer> colExistencia;
 
-    @FXML
-    private TableColumn<Producto, Boolean> colActivo;
+
+    /*
+     * CRUD encargado de almacenar los productos.
+     */
+    private final Crud<Producto> productoCrud =
+            new ProductoCrud();
 
 
-    // Lista que almacena todos los productos registrados
+    /*
+     * Lista con todos los productos almacenados.
+     *
+     * ProductoCrud conserva esta lista aunque
+     * se cierre y vuelva a abrir la ventana.
+     */
     private final ObservableList<Producto> productos =
-            FXCollections.observableArrayList();
+            productoCrud.listar();
 
 
-    // Lista que se muestra actualmente en la tabla
+    /*
+     * Lista que se muestra actualmente
+     * en el TableView.
+     */
     private final ObservableList<Producto> productosMostrados =
             FXCollections.observableArrayList();
 
@@ -79,19 +93,24 @@ public class ProductoController {
     @FXML
     private void initialize() {
 
-        // Categorías temporales
+        /*
+         * Categorías temporales.
+         */
         cmbCategoria.setItems(
                 FXCollections.observableArrayList(
+
                         new Categoria(
                                 1,
                                 "Alimentos",
                                 true
                         ),
+
                         new Categoria(
                                 2,
                                 "Bebidas",
                                 true
                         ),
+
                         new Categoria(
                                 3,
                                 "Limpieza",
@@ -101,47 +120,69 @@ public class ProductoController {
         );
 
 
-        // Configuración de las columnas
+        /*
+         * Configuración de columnas.
+         */
         colCodigo.setCellValueFactory(
-                new PropertyValueFactory<>("codigo")
+                new PropertyValueFactory<>(
+                        "codigo"
+                )
         );
 
         colNombre.setCellValueFactory(
-                new PropertyValueFactory<>("nombre")
+                new PropertyValueFactory<>(
+                        "nombre"
+                )
         );
 
         colCategoria.setCellValueFactory(
-                new PropertyValueFactory<>("categoria")
+                new PropertyValueFactory<>(
+                        "categoria"
+                )
         );
 
         colPrecio.setCellValueFactory(
-                new PropertyValueFactory<>("precioVenta")
+                new PropertyValueFactory<>(
+                        "precioVenta"
+                )
         );
 
         colExistencia.setCellValueFactory(
-                new PropertyValueFactory<>("existencia")
+                new PropertyValueFactory<>(
+                        "existencia"
+                )
         );
 
-        colActivo.setCellValueFactory(
-                new PropertyValueFactory<>("activo")
+
+        /*
+         * Configurar tabla.
+         */
+        tblProductos.setItems(
+                productosMostrados
         );
 
 
-        // Lista que mostrará el TableView
-        tblProductos.setItems(productosMostrados);
-
-
-        // Mensaje en español cuando la tabla esté vacía
+        /*
+         * Mensaje cuando la tabla esté vacía.
+         */
         tblProductos.setPlaceholder(
-                new Label("No hay productos para mostrar.")
+                new Label(
+                        "No hay productos para mostrar."
+                )
         );
 
 
-        // Valores iniciales
+        /*
+         * Valores iniciales.
+         */
         chkActivo.setSelected(true);
+
         chkVerTodos.setSelected(true);
 
 
+        /*
+         * Mostrar productos existentes.
+         */
         actualizarTabla();
     }
 
@@ -152,9 +193,11 @@ public class ProductoController {
         FileChooser chooser =
                 new FileChooser();
 
+
         chooser
                 .getExtensionFilters()
                 .add(
+
                         new FileChooser.ExtensionFilter(
                                 "Imágenes",
                                 "*.png",
@@ -163,20 +206,29 @@ public class ProductoController {
                         )
                 );
 
+
         File archivo =
                 chooser.showOpenDialog(
+
                         txtCodigo
                                 .getScene()
                                 .getWindow()
                 );
 
+
         if (archivo != null) {
 
             rutaImagen =
-                    archivo.toURI().toString();
+                    archivo
+                            .toURI()
+                            .toString();
+
 
             imgProducto.setImage(
-                    new Image(rutaImagen)
+
+                    new Image(
+                            rutaImagen
+                    )
             );
         }
     }
@@ -185,7 +237,9 @@ public class ProductoController {
     @FXML
     private void guardar() {
 
-        // Validar campos obligatorios
+        /*
+         * Validar campos obligatorios.
+         */
         if (txtCodigo.getText().isBlank()
                 || txtNombre.getText().isBlank()
                 || txtPrecio.getText().isBlank()
@@ -205,20 +259,25 @@ public class ProductoController {
 
             BigDecimal precio =
                     new BigDecimal(
+
                             txtPrecio
                                     .getText()
                                     .trim()
                     );
 
+
             int existencia =
                     Integer.parseInt(
+
                             txtExistencia
                                     .getText()
                                     .trim()
                     );
 
 
-            // Validar precio y existencia
+            /*
+             * Validar precio.
+             */
             if (precio.signum() <= 0) {
 
                 mensaje(
@@ -230,6 +289,9 @@ public class ProductoController {
             }
 
 
+            /*
+             * Validar existencia.
+             */
             if (existencia < 0) {
 
                 mensaje(
@@ -241,21 +303,47 @@ public class ProductoController {
             }
 
 
+            /*
+             * Crear producto.
+             */
             Producto producto =
                     new Producto(
+
                             null,
-                            txtCodigo.getText().trim(),
-                            txtNombre.getText().trim(),
-                            cmbCategoria.getValue(),
+
+                            txtCodigo
+                                    .getText()
+                                    .trim(),
+
+                            txtNombre
+                                    .getText()
+                                    .trim(),
+
+                            cmbCategoria
+                                    .getValue(),
+
                             precio,
+
                             existencia,
+
                             rutaImagen,
-                            chkActivo.isSelected()
+
+                            chkActivo
+                                    .isSelected()
                     );
 
 
-            productos.add(producto);
+            /*
+             * Guardar mediante CRUD.
+             */
+            productoCrud.guardar(
+                    producto
+            );
 
+
+            /*
+             * Refrescar tabla.
+             */
             actualizarTabla();
 
 
@@ -266,6 +354,7 @@ public class ProductoController {
 
 
             limpiar();
+
 
         } catch (NumberFormatException e) {
 
@@ -278,8 +367,8 @@ public class ProductoController {
 
 
     /*
-     * Se ejecuta cuando el usuario marca
-     * o desmarca la opción "Ver todos".
+     * Se ejecuta cuando cambia
+     * el CheckBox "Ver todos".
      */
     @FXML
     private void filtrarProductos() {
@@ -289,17 +378,17 @@ public class ProductoController {
 
 
     /*
-     * Si "Ver todos" está seleccionado,
-     * se muestran todos los productos.
-     *
-     * Si está desmarcado,
-     * solamente se muestran los productos activos.
+     * Mostrar todos o solamente
+     * los productos activos.
      */
     private void actualizarTabla() {
 
         productosMostrados.clear();
 
 
+        /*
+         * Ver todos.
+         */
         if (chkVerTodos.isSelected()) {
 
             productosMostrados.addAll(
@@ -308,6 +397,9 @@ public class ProductoController {
 
         } else {
 
+            /*
+             * Mostrar solamente activos.
+             */
             for (Producto producto : productos) {
 
                 if (producto.isActivo()) {
@@ -324,8 +416,11 @@ public class ProductoController {
     private void limpiar() {
 
         txtCodigo.clear();
+
         txtNombre.clear();
+
         txtPrecio.clear();
+
         txtExistencia.clear();
 
 
@@ -348,7 +443,7 @@ public class ProductoController {
 
 
     /*
-     * Alertas completamente en español.
+     * Alertas en español.
      */
     private void mensaje(
             Alert.AlertType tipo,
@@ -356,7 +451,9 @@ public class ProductoController {
     ) {
 
         ButtonType aceptar =
-                new ButtonType("Aceptar");
+                new ButtonType(
+                        "Aceptar"
+                );
 
 
         Alert alerta =
@@ -367,19 +464,22 @@ public class ProductoController {
                 );
 
 
-        if (tipo == Alert.AlertType.WARNING) {
+        if (tipo ==
+                Alert.AlertType.WARNING) {
 
             alerta.setTitle(
                     "Advertencia"
             );
 
-        } else if (tipo == Alert.AlertType.ERROR) {
+        } else if (tipo ==
+                Alert.AlertType.ERROR) {
 
             alerta.setTitle(
                     "Error"
             );
 
-        } else if (tipo == Alert.AlertType.INFORMATION) {
+        } else if (tipo ==
+                Alert.AlertType.INFORMATION) {
 
             alerta.setTitle(
                     "Información"
