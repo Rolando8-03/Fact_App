@@ -9,7 +9,7 @@
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="ni.edu.uam.fact_app.controller.ProductoController"
-            prefWidth="900.0"
+            prefWidth="950.0"
             prefHeight="650.0">
 
     <top>
@@ -31,22 +31,37 @@
 
     <center>
 
-        <VBox spacing="15">
+        <VBox spacing="12">
 
             <padding>
-                <Insets top="15"
-                        right="20"
+                <Insets top="10"
+                        right="25"
                         bottom="20"
-                        left="20"/>
+                        left="25"/>
             </padding>
 
-            <HBox spacing="25">
+            <!-- Formulario e imagen -->
+            <HBox spacing="30"
+                  alignment="TOP_LEFT">
 
+                <!-- Datos del producto -->
                 <GridPane hgap="10"
                           vgap="12"
-                          HBox.hgrow="ALWAYS">
+                          prefWidth="430">
 
-                    <Label text="Código:"
+                    <columnConstraints>
+
+                        <ColumnConstraints minWidth="100"
+                                           prefWidth="100"/>
+
+                        <ColumnConstraints minWidth="300"
+                                           prefWidth="300"
+                                           hgrow="ALWAYS"/>
+
+                    </columnConstraints>
+
+                    <!-- Código -->
+                    <Label text="Código *:"
                            GridPane.columnIndex="0"
                            GridPane.rowIndex="0"/>
 
@@ -55,7 +70,8 @@
                                GridPane.columnIndex="1"
                                GridPane.rowIndex="0"/>
 
-                    <Label text="Nombre:"
+                    <!-- Nombre -->
+                    <Label text="Nombre *:"
                            GridPane.columnIndex="0"
                            GridPane.rowIndex="1"/>
 
@@ -64,16 +80,18 @@
                                GridPane.columnIndex="1"
                                GridPane.rowIndex="1"/>
 
-                    <Label text="Categoría:"
+                    <!-- Categoría -->
+                    <Label text="Categoría *:"
                            GridPane.columnIndex="0"
                            GridPane.rowIndex="2"/>
 
                     <ComboBox fx:id="cmbCategoria"
-                              prefWidth="250"
+                              prefWidth="300"
                               GridPane.columnIndex="1"
                               GridPane.rowIndex="2"/>
 
-                    <Label text="Precio:"
+                    <!-- Precio -->
+                    <Label text="Precio *:"
                            GridPane.columnIndex="0"
                            GridPane.rowIndex="3"/>
 
@@ -82,7 +100,8 @@
                                GridPane.columnIndex="1"
                                GridPane.rowIndex="3"/>
 
-                    <Label text="Existencia:"
+                    <!-- Existencia -->
+                    <Label text="Existencia *:"
                            GridPane.columnIndex="0"
                            GridPane.rowIndex="4"/>
 
@@ -91,6 +110,7 @@
                                GridPane.columnIndex="1"
                                GridPane.rowIndex="4"/>
 
+                    <!-- Estado -->
                     <Label text="Estado:"
                            GridPane.columnIndex="0"
                            GridPane.rowIndex="5"/>
@@ -102,16 +122,29 @@
 
                 </GridPane>
 
+                <!-- Imagen del producto -->
                 <VBox spacing="10"
-                      alignment="CENTER"
-                      prefWidth="220">
+                      alignment="TOP_CENTER"
+                      prefWidth="420"
+                      HBox.hgrow="ALWAYS">
 
-                    <Label text="Imagen del producto"/>
+                    <Label text="Imagen del producto"
+                           style="-fx-font-weight: bold;"/>
 
-                    <ImageView fx:id="imgProducto"
-                               fitWidth="180"
-                               fitHeight="140"
-                               preserveRatio="true"/>
+                    <StackPane prefWidth="360"
+                               prefHeight="235"
+                               minWidth="360"
+                               minHeight="235"
+                               style="-fx-border-color: #b5b5b5;
+                                      -fx-border-width: 1;
+                                      -fx-background-color: white;">
+
+                        <ImageView fx:id="imgProducto"
+                                   fitWidth="350"
+                                   fitHeight="225"
+                                   preserveRatio="true"/>
+
+                    </StackPane>
 
                     <Button fx:id="btnImagen"
                             text="Seleccionar imagen"
@@ -121,8 +154,20 @@
 
             </HBox>
 
+            <!-- Información de campos obligatorios -->
+            <Label text="* Campos obligatorios"
+                   style="-fx-text-fill: #b00020;"/>
+
+            <!-- Filtro y botón guardar -->
             <HBox spacing="10"
-                  alignment="CENTER_RIGHT">
+                  alignment="CENTER_LEFT">
+
+                <CheckBox fx:id="chkVerTodos"
+                          text="Ver todos"
+                          selected="true"
+                          onAction="#filtrarProductos"/>
+
+                <Region HBox.hgrow="ALWAYS"/>
 
                 <Button fx:id="btnGuardar"
                         text="Guardar"
@@ -144,28 +189,9 @@
 
                 </Button>
 
-                <Button fx:id="btnCerrar"
-                        text="Cerrar"
-                        onAction="#cerrar">
-
-                    <graphic>
-
-                        <ImageView fitWidth="18"
-                                   fitHeight="18"
-                                   preserveRatio="true">
-
-                            <image>
-                                <Image url="@../icons/cerrar.png"/>
-                            </image>
-
-                        </ImageView>
-
-                    </graphic>
-
-                </Button>
-
             </HBox>
 
+            <!-- Tabla -->
             <TableView fx:id="tblProductos"
                        VBox.vgrow="ALWAYS">
 
@@ -173,27 +199,27 @@
 
                     <TableColumn fx:id="colCodigo"
                                  text="Código"
-                                 prefWidth="100"/>
+                                 prefWidth="120"/>
 
                     <TableColumn fx:id="colNombre"
                                  text="Nombre"
-                                 prefWidth="170"/>
+                                 prefWidth="190"/>
 
                     <TableColumn fx:id="colCategoria"
                                  text="Categoría"
-                                 prefWidth="140"/>
+                                 prefWidth="160"/>
 
                     <TableColumn fx:id="colPrecio"
                                  text="Precio"
-                                 prefWidth="110"/>
+                                 prefWidth="130"/>
 
                     <TableColumn fx:id="colExistencia"
                                  text="Existencia"
-                                 prefWidth="110"/>
+                                 prefWidth="130"/>
 
                     <TableColumn fx:id="colActivo"
                                  text="Activo"
-                                 prefWidth="90"/>
+                                 prefWidth="100"/>
 
                 </columns>
 

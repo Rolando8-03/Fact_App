@@ -8,7 +8,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.FileChooser;
-import javafx.stage.Stage;
+
 import ni.edu.uam.fact_app.model.Categoria;
 import ni.edu.uam.fact_app.model.Producto;
 
@@ -36,6 +36,9 @@ public class ProductoController {
     private CheckBox chkActivo;
 
     @FXML
+    private CheckBox chkVerTodos;
+
+    @FXML
     private ImageView imgProducto;
 
     @FXML
@@ -59,14 +62,24 @@ public class ProductoController {
     @FXML
     private TableColumn<Producto, Boolean> colActivo;
 
+
+    // Lista que almacena todos los productos registrados
     private final ObservableList<Producto> productos =
             FXCollections.observableArrayList();
 
+
+    // Lista que se muestra actualmente en la tabla
+    private final ObservableList<Producto> productosMostrados =
+            FXCollections.observableArrayList();
+
+
     private String rutaImagen;
+
 
     @FXML
     private void initialize() {
 
+        // Categorías temporales
         cmbCategoria.setItems(
                 FXCollections.observableArrayList(
                         new Categoria(
@@ -87,6 +100,8 @@ public class ProductoController {
                 )
         );
 
+
+        // Configuración de las columnas
         colCodigo.setCellValueFactory(
                 new PropertyValueFactory<>("codigo")
         );
@@ -111,10 +126,25 @@ public class ProductoController {
                 new PropertyValueFactory<>("activo")
         );
 
-        tblProductos.setItems(productos);
 
+        // Lista que mostrará el TableView
+        tblProductos.setItems(productosMostrados);
+
+
+        // Mensaje en español cuando la tabla esté vacía
+        tblProductos.setPlaceholder(
+                new Label("No hay productos para mostrar.")
+        );
+
+
+        // Valores iniciales
         chkActivo.setSelected(true);
+        chkVerTodos.setSelected(true);
+
+
+        actualizarTabla();
     }
+
 
     @FXML
     private void seleccionarImagen() {
@@ -151,9 +181,11 @@ public class ProductoController {
         }
     }
 
+
     @FXML
     private void guardar() {
 
+        // Validar campos obligatorios
         if (txtCodigo.getText().isBlank()
                 || txtNombre.getText().isBlank()
                 || txtPrecio.getText().isBlank()
@@ -162,11 +194,12 @@ public class ProductoController {
 
             mensaje(
                     Alert.AlertType.WARNING,
-                    "Complete los campos obligatorios."
+                    "Debe completar todos los campos obligatorios marcados con *."
             );
 
             return;
         }
+
 
         try {
 
@@ -184,16 +217,29 @@ public class ProductoController {
                                     .trim()
                     );
 
-            if (precio.signum() <= 0
-                    || existencia < 0) {
+
+            // Validar precio y existencia
+            if (precio.signum() <= 0) {
 
                 mensaje(
                         Alert.AlertType.WARNING,
-                        "Precio mayor que cero y existencia no negativa."
+                        "El precio debe ser mayor que cero."
                 );
 
                 return;
             }
+
+
+            if (existencia < 0) {
+
+                mensaje(
+                        Alert.AlertType.WARNING,
+                        "La existencia no puede ser negativa."
+                );
+
+                return;
+            }
+
 
             Producto producto =
                     new Producto(
@@ -207,12 +253,17 @@ public class ProductoController {
                             chkActivo.isSelected()
                     );
 
+
             productos.add(producto);
+
+            actualizarTabla();
+
 
             mensaje(
                     Alert.AlertType.INFORMATION,
                     "Producto agregado correctamente."
             );
+
 
             limpiar();
 
@@ -220,21 +271,55 @@ public class ProductoController {
 
             mensaje(
                     Alert.AlertType.ERROR,
-                    "Precio o existencia no válidos."
+                    "El precio y la existencia deben contener valores numéricos válidos."
             );
         }
     }
 
+
+    /*
+     * Se ejecuta cuando el usuario marca
+     * o desmarca la opción "Ver todos".
+     */
     @FXML
-    private void cerrar() {
+    private void filtrarProductos() {
 
-        Stage stage =
-                (Stage) txtCodigo
-                        .getScene()
-                        .getWindow();
-
-        stage.close();
+        actualizarTabla();
     }
+
+
+    /*
+     * Si "Ver todos" está seleccionado,
+     * se muestran todos los productos.
+     *
+     * Si está desmarcado,
+     * solamente se muestran los productos activos.
+     */
+    private void actualizarTabla() {
+
+        productosMostrados.clear();
+
+
+        if (chkVerTodos.isSelected()) {
+
+            productosMostrados.addAll(
+                    productos
+            );
+
+        } else {
+
+            for (Producto producto : productos) {
+
+                if (producto.isActivo()) {
+
+                    productosMostrados.add(
+                            producto
+                    );
+                }
+            }
+        }
+    }
+
 
     private void limpiar() {
 
@@ -243,26 +328,74 @@ public class ProductoController {
         txtPrecio.clear();
         txtExistencia.clear();
 
+
         cmbCategoria
                 .getSelectionModel()
                 .clearSelection();
 
+
         chkActivo.setSelected(true);
+
 
         imgProducto.setImage(null);
 
+
         rutaImagen = null;
+
+
+        txtCodigo.requestFocus();
     }
 
+
+    /*
+     * Alertas completamente en español.
+     */
     private void mensaje(
             Alert.AlertType tipo,
             String texto
     ) {
 
-        new Alert(
-                tipo,
-                texto,
-                ButtonType.OK
-        ).showAndWait();
+        ButtonType aceptar =
+                new ButtonType("Aceptar");
+
+
+        Alert alerta =
+                new Alert(
+                        tipo,
+                        texto,
+                        aceptar
+                );
+
+
+        if (tipo == Alert.AlertType.WARNING) {
+
+            alerta.setTitle(
+                    "Advertencia"
+            );
+
+        } else if (tipo == Alert.AlertType.ERROR) {
+
+            alerta.setTitle(
+                    "Error"
+            );
+
+        } else if (tipo == Alert.AlertType.INFORMATION) {
+
+            alerta.setTitle(
+                    "Información"
+            );
+
+        } else {
+
+            alerta.setTitle(
+                    "Mensaje"
+            );
+        }
+
+
+        alerta.setHeaderText(null);
+
+
+        alerta.showAndWait();
     }
 }
