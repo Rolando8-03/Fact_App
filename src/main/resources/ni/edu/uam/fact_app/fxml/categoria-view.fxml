@@ -110,12 +110,6 @@
                     <TableColumn fx:id="colNombre" prefWidth="430" text="Nombre" />
 
 
-                    <!--
-                        ESTA COLUMNA SE MANTIENE,
-                        TAL COMO PEDISTE.
-                    -->
-                    <TableColumn fx:id="colActiva" prefWidth="160" text="Activa" />
-
                 </columns>
             <columnResizePolicy>
                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
