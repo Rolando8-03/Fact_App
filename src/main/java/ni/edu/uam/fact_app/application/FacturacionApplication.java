@@ -30,6 +30,8 @@ public class FacturacionApplication extends Application {
                 )
         );
 
+        stage.setResizable(false);
+
         stage.show();
     }
 
