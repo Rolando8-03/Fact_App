@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane prefWidth="500" prefHeight="460" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ni.edu.uam.fact_app.controller.LoginController">
+ <center><VBox alignment="CENTER" spacing="18">
+  <padding><Insets top="25" bottom="25" left="60" right="60"/></padding>
+  <ImageView fitWidth="95" fitHeight="95" preserveRatio="true"><image><Image url="@../images/logo.png"/></image></ImageView>
+  <Label text="Sistema de facturación" style="-fx-font-size: 22px; -fx-font-weight: bold;"/>
+  <GridPane hgap="12" vgap="15">
+   <columnConstraints><ColumnConstraints minWidth="85"/><ColumnConstraints hgrow="ALWAYS"/></columnConstraints>
+   <Label text="Usuario:"/>
+   <TextField fx:id="txtUsuario" promptText="Nombre de usuario" GridPane.columnIndex="1" onAction="#iniciarSesion"/>
+   <Label text="Contraseña:" GridPane.rowIndex="1"/>
+   <PasswordField fx:id="txtPassword" promptText="Contraseña" GridPane.columnIndex="1" GridPane.rowIndex="1" onAction="#iniciarSesion"/>
+  </GridPane>
+  <Label fx:id="lblError" wrapText="true" maxWidth="370" style="-fx-text-fill: #b00020;"/>
+  <Button text="Iniciar sesión" defaultButton="true" onAction="#iniciarSesion" prefWidth="180"/>
+ </VBox></center>
+</BorderPane>

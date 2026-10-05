@@ -1,57 +1,20 @@
 package ni.edu.uam.fact_app.util;
-
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import ni.edu.uam.fact_app.model.Categoria;
+import ni.edu.uam.fact_app.dao.CategoriaDAO;
+import java.sql.SQLException;
 
 public class CategoriaCrud implements Crud<Categoria> {
-
-    /*
-     * Lista compartida de categorías.
-     *
-     * Al ser static, las categorías permanecen
-     * aunque se cierre y vuelva a abrir la ventana.
-     */
-    private static final ObservableList<Categoria> categorias =
-            FXCollections.observableArrayList();
-
-
-    @Override
-    public void guardar(Categoria categoria) {
-
-        categorias.add(categoria);
+    private final CategoriaDAO dao = new CategoriaDAO();
+    private final ObservableList<Categoria> datos = FXCollections.observableArrayList();
+    public void guardar(Categoria objeto) throws SQLException { dao.guardar(objeto); listar(); }
+    public ObservableList<Categoria> listar() throws SQLException { datos.setAll(dao.listar()); return datos; }
+    public void actualizar(int indice, Categoria objeto) throws SQLException {
+        if (indice < 0 || indice >= datos.size()) throw new SQLException("Seleccione un registro válido.");
+        objeto.setId(datos.get(indice).getId());
+        dao.actualizar(objeto);
+        listar();
     }
-
-
-    @Override
-    public ObservableList<Categoria> listar() {
-
-        return categorias;
-    }
-
-
-    @Override
-    public void actualizar(
-            int indice,
-            Categoria categoria
-    ) {
-
-        if (indice >= 0
-                && indice < categorias.size()) {
-
-            categorias.set(
-                    indice,
-                    categoria
-            );
-        }
-    }
-
-
-    @Override
-    public void eliminar(
-            Categoria categoria
-    ) {
-
-        categorias.remove(categoria);
-    }
+    public void eliminar(Categoria objeto) throws SQLException { dao.eliminar(objeto.getId()); listar(); }
 }

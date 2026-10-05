@@ -17,4 +17,6 @@ public class Producto {
     private int existencia;
     private String rutaImagen;
     private boolean activo;
+    @Override
+    public String toString() { return codigo + " - " + nombre; }
 }

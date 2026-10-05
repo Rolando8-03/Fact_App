@@ -1,200 +1,74 @@
-# Fact_App
+# Fact_App actualizado
 
-Aplicación de escritorio desarrollada en JavaFX como proyecto académico para la asignatura **Programación de Aplicaciones de Escritorio**.
+Rolando Enrique Mayorga Mena
+Programación de Aplicaciones de Escritorio — MSc. José Alejandro Durán García
 
-El proyecto representa la base de un sistema de facturación y permite gestionar categorías, productos, cargos y empleados mediante diferentes formularios desarrollados con JavaFX y FXML.
+Integración basada en tu proyecto y en los dos ZIP de referencia proporcionados. Se conserva el paquete ni.edu.uam.fact_app, los formularios claros, el logo, los iconos, la distribución original de campos y el resumen del menú.
 
-## Estudiante
+## Preparar PostgreSQL
 
-- Rolando Enrique Mayorga Mena
+1. En pgAdmin, abra Query Tool conectado a la base `postgres`.
+2. Ejecute únicamente `sql/01_crear_base.sql`, con Auto-commit activo. CREATE DATABASE no debe ejecutarse dentro de BEGIN/COMMIT. Si ya existe `fact_app`, omita este paso.
+3. Actualice el árbol y abra otro Query Tool conectado a `fact_app`.
+4. Ejecute `sql/02_tablas.sql`. Está preparado para una base nueva; CREATE TABLE IF NOT EXISTS no adapta columnas de tablas antiguas con una estructura diferente.
+5. Opcionalmente, ejecute `sql/03_datos_ejemplo_opcional.sql` para tener categorías, cargos y un producto de prueba.
+6. Edite `config/database.properties` y escriba su contraseña de PostgreSQL después de `db.password=`. Ajuste puerto, nombre de base y usuario si corresponden.
 
-## Asignatura
-
-**Programación de Aplicaciones de Escritorio**
-
-**Docente:** MSc. José Alejandro Durán García
-
-## Tecnologías utilizadas
-
-- Java 21
-- JavaFX 21.0.6
-- FXML
-- Scene Builder
-- Maven
-- Lombok
-- IntelliJ IDEA
-- Git y GitHub
-
-## Funcionalidades
-
-La aplicación cuenta actualmente con los siguientes módulos:
-
-### Categorías
-
-Permite:
-
-- Registrar categorías.
-- Indicar si una categoría está activa.
-- Visualizar las categorías registradas.
-- Mostrar todas las categorías o únicamente las activas.
-- Conservar temporalmente los registros al cerrar y volver a abrir la ventana.
-
-### Productos
-
-Permite:
-
-- Registrar código del producto.
-- Registrar nombre.
-- Seleccionar una categoría previamente registrada.
-- Registrar precio de venta.
-- Registrar existencia.
-- Indicar si el producto está activo.
-- Seleccionar una imagen para el producto.
-- Visualizar los productos registrados.
-- Mostrar todos los productos o únicamente los activos.
-- Conservar temporalmente los registros al cerrar y volver a abrir la ventana.
-
-### Cargos
-
-Permite:
-
-- Registrar el nombre de un cargo.
-- Registrar una descripción.
-- Visualizar los cargos registrados.
-- Conservar temporalmente los registros al cerrar y volver a abrir la ventana.
-
-### Empleados
-
-Permite:
-
-- Registrar nombres.
-- Registrar apellidos.
-- Seleccionar un cargo previamente registrado.
-- Seleccionar la fecha de contratación.
-- Validar que la fecha de contratación no sea posterior a la fecha actual.
-- Indicar si el empleado está activo.
-- Visualizar los empleados registrados.
-- Conservar temporalmente los registros al cerrar y volver a abrir la ventana.
-
-## Pantalla principal
-
-La pantalla principal permite acceder a los diferentes módulos mediante una barra de herramientas.
-
-Los botones utilizan íconos y muestran un `Tooltip` al colocar el cursor sobre ellos.
-
-También se presenta un resumen con la cantidad de:
-
-- Categorías registradas.
-- Productos registrados.
-- Cargos registrados.
-- Empleados registrados.
-
-El resumen se actualiza al regresar de cada módulo.
-
-## CRUD
-
-El proyecto utiliza una interfaz genérica `Crud<T>` con las operaciones:
-
-```java
-void guardar(T objeto);
-ObservableList<T> listar();
-void actualizar(int indice, T objeto);
-void eliminar(T objeto);
+```properties
+db.url=jdbc:postgresql://localhost:5432/fact_app
+db.user=postgres
+db.password=SU_CONTRASENA
 ```
 
-Actualmente se implementan las siguientes clases:
+La contraseña de PostgreSQL no es la contraseña del formulario de inicio de sesión. Los archivos se leen como Java Properties: si una contraseña contiene una barra invertida, escríbala duplicada. También se admiten las variables FACT_DB_URL, FACT_DB_USER y FACT_DB_PASSWORD, con prioridad sobre el archivo.
 
-```text
-CategoriaCrud
-ProductoCrud
-CargoCrud
-EmpleadoCrud
-```
+## Abrir y ejecutar
 
-Estas clases utilizan listas temporales compartidas para conservar los registros mientras la aplicación continúa ejecutándose.
+1. Extraiga todo el ZIP.
+2. En IntelliJ, abra el `pom.xml` como proyecto Maven.
+3. Seleccione JDK 21 para el proyecto y para Maven; recargue las dependencias.
+4. Use como directorio de trabajo la carpeta que contiene `pom.xml`.
+5. Ejecute `ni.edu.uam.fact_app.application.FacturacionApplication`, o el objetivo Maven `javafx:run`.
 
-## Estructura del proyecto
+En Windows también puede ejecutar `iniciar.bat` con JAVA_HOME apuntando al JDK 21. La primera ejecución necesita Internet para descargar Maven y las dependencias.
 
-```text
-src/main
-├── java
-│   └── ni.edu.uam.fact_app
-│       ├── application
-│       │   └── FacturacionApplication.java
-│       │
-│       ├── controller
-│       │   ├── MenuPrincipalController.java
-│       │   ├── CategoriaController.java
-│       │   ├── ProductoController.java
-│       │   ├── CargoController.java
-│       │   └── EmpleadoController.java
-│       │
-│       ├── model
-│       │   ├── Categoria.java
-│       │   ├── Producto.java
-│       │   ├── Cargo.java
-│       │   └── Empleado.java
-│       │
-│       └── util
-│           ├── Crud.java
-│           ├── CategoriaCrud.java
-│           ├── ProductoCrud.java
-│           ├── CargoCrud.java
-│           ├── EmpleadoCrud.java
-│           └── SceneManager.java
-│
-└── resources
-    └── ni.edu.uam.fact_app
-        ├── fxml
-        │   ├── menu-principal.fxml
-        │   ├── categoria-view.fxml
-        │   ├── producto-view.fxml
-        │   ├── cargo-view.fxml
-        │   └── empleado-view.fxml
-        │
-        ├── images
-        └── icons
-```
+## Cuentas de práctica
 
-## Validaciones
+| Usuario | Contraseña | Módulos habilitados |
+| --- | --- | --- |
+| admin | admin123 | Todos |
+| cajero | cajero123 | Productos y ventas |
+| bodega | bodega123 | Productos y categorías |
 
-Los formularios incluyen validaciones para evitar registros incorrectos.
+Se conserva el mecanismo de cuentas de demostración de la referencia. Estas cuentas están definidas en LoginController, no se crean desde Empleados y no constituyen un sistema de administración de usuarios. La factura guarda el nombre del usuario y del vendedor de la sesión.
 
-Entre ellas se encuentran:
+## Uso
 
-- Validación de campos obligatorios.
-- Precio mayor que cero.
-- Existencia no negativa.
-- Validación de valores numéricos.
-- Fecha de contratación no posterior a la fecha actual.
-- Mensajes de advertencia, error e información en español.
+- **Guardar:** agrega un registro nuevo. Al seleccionar una fila, cambia a **Actualizar**.
+- **Nuevo:** limpia el formulario y sale del modo de edición.
+- **Eliminar:** solicita confirmación. Las relaciones impiden eliminar registros utilizados; puede desactivar categorías, productos o empleados.
+- **Buscar:** permite filtrar por ID exacto o por nombre; productos también permite código. El diálogo Buscar ofrece ID o nombre.
+- **Restablecer:** quita los filtros.
+- **Refrescar:** recarga desde PostgreSQL y limpia el formulario; úselo después de guardar o cuando no necesite conservar cambios pendientes.
+- **Categorías:** actualización automática de la tabla cada 2.5 segundos, pausada durante la edición o mientras escribe un nuevo nombre. Se detiene al cerrar la ventana.
+- **Productos:** filtros por estado y categoría; selección y vista previa de imágenes. Las imágenes nuevas se copian a `data/imagenes`. Conserve esa carpeta al mover el proyecto.
+- **Empleados:** nombres, apellidos, cargo, fecha y estado; no admite fechas de contratación futuras.
+- **Ventas:** busque un producto, seleccione cantidad, agregue artículos y confirme Finalizar venta. Se valida la existencia acumulada y se calcula subtotal, IVA del 15 % y total, siguiendo la lógica de la referencia.
 
-Los campos obligatorios se identifican mediante un asterisco `*`.
+La factura, sus detalles y el descuento de inventario se guardan en una sola transacción. El número se asigna al guardar y permanece en PostgreSQL. Las ventas registradas pueden consultarse con `sql/04_consultar_ventas.sql`.
 
-## Navegación
+## Organización del código
 
-La aplicación utiliza `SceneManager` para abrir los diferentes formularios.
+- `controller`: interacción de los siete formularios.
+- `dao`: consultas parametrizadas y operaciones de PostgreSQL.
+- `model`: categorías, cargos, empleados, productos, usuarios y ventas.
+- `util`: conexión, navegación, sesión, alertas, búsqueda y actualización automática.
+- `Crud<T>` y sus cuatro implementaciones se conservan como adaptadores a los DAO; los formularios nuevos utilizan los DAO directamente.
+- `src/main/resources`: FXML, imágenes e iconos.
 
-Las ventanas secundarias son modales y no permiten maximizarse ni cambiar manualmente su tamaño.
+## Verificación realizada
 
-## Almacenamiento actual
+Compilación modular con Java 21 y construcción Maven: BUILD SUCCESS.
+Se ejecutaron 31 comprobaciones con JavaFX 21.0.6 y una base PostgreSQL de prueba mediante PGlite (PostgreSQL en WebAssembly), incluyendo carga y renderizado de las siete pantallas, CRUD, filtros, permisos, factura y reversión de cambios cuando falla una venta. Se revisaron visualmente las pantallas y se corrigieron textos recortados.
 
-Actualmente los datos se almacenan temporalmente utilizando `ObservableList`.
-
-Esto significa que los registros permanecen disponibles al cerrar y volver a abrir los formularios mientras la aplicación siga ejecutándose.
-
-Al cerrar completamente la aplicación, los registros se eliminan.
-
-La incorporación de persistencia mediante una base de datos corresponde a una etapa posterior del proyecto.
-
-## Ejecución
-
-1. Clonar el repositorio.
-2. Abrir el proyecto en IntelliJ IDEA.
-3. Esperar a que Maven cargue las dependencias.
-4. Verificar que el proyecto utilice Java 21.
-5. Ejecutar `FacturacionApplication`.
-
-## Repositorio
-
-Proyecto desarrollado utilizando Git y GitHub para mantener un historial de cambios progresivo durante su desarrollo.
+La conexión a su instalación de PostgreSQL y la ejecución en su Windows requieren la configuración indicada arriba; no se accedió a su equipo ni a sus datos locales. No se incluyen los datos personales de sus compañeros.

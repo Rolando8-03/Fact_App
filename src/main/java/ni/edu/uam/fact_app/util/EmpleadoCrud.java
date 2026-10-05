@@ -1,54 +1,20 @@
 package ni.edu.uam.fact_app.util;
-
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import ni.edu.uam.fact_app.model.Empleado;
+import ni.edu.uam.fact_app.dao.EmpleadoDAO;
+import java.sql.SQLException;
 
 public class EmpleadoCrud implements Crud<Empleado> {
-
-    /*
-     * La lista es static para conservar los empleados
-     * aunque se cierre y vuelva a abrir la ventana.
-     */
-    private static final ObservableList<Empleado> empleados =
-            FXCollections.observableArrayList();
-
-
-    @Override
-    public void guardar(Empleado empleado) {
-
-        empleados.add(empleado);
+    private final EmpleadoDAO dao = new EmpleadoDAO();
+    private final ObservableList<Empleado> datos = FXCollections.observableArrayList();
+    public void guardar(Empleado objeto) throws SQLException { dao.guardar(objeto); listar(); }
+    public ObservableList<Empleado> listar() throws SQLException { datos.setAll(dao.listar()); return datos; }
+    public void actualizar(int indice, Empleado objeto) throws SQLException {
+        if (indice < 0 || indice >= datos.size()) throw new SQLException("Seleccione un registro válido.");
+        objeto.setId(datos.get(indice).getId());
+        dao.actualizar(objeto);
+        listar();
     }
-
-
-    @Override
-    public ObservableList<Empleado> listar() {
-
-        return empleados;
-    }
-
-
-    @Override
-    public void actualizar(
-            int indice,
-            Empleado empleado
-    ) {
-
-        if (indice >= 0 && indice < empleados.size()) {
-
-            empleados.set(
-                    indice,
-                    empleado
-            );
-        }
-    }
-
-
-    @Override
-    public void eliminar(
-            Empleado empleado
-    ) {
-
-        empleados.remove(empleado);
-    }
+    public void eliminar(Empleado objeto) throws SQLException { dao.eliminar(objeto.getId()); listar(); }
 }

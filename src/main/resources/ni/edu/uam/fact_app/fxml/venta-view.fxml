@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane prefWidth="950" prefHeight="660" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ni.edu.uam.fact_app.controller.VentaController">
+ <top><Label text="Registro de ventas" style="-fx-font-size: 22px; -fx-font-weight: bold;" BorderPane.alignment="CENTER">
+  <padding><Insets top="15" bottom="15" left="10" right="10"/></padding>
+ </Label></top>
+ <center><VBox spacing="15">
+  <padding><Insets top="10" bottom="20" left="25" right="25"/></padding>
+  <HBox spacing="15" alignment="CENTER_LEFT">
+   <Label fx:id="lblNumeroFactura" text="Nueva factura" style="-fx-font-weight: bold;"/>
+   <Region HBox.hgrow="ALWAYS"/><Label text="Vendedor:"/><Label fx:id="lblVendedor"/>
+  </HBox>
+  <HBox spacing="10" alignment="CENTER_LEFT">
+   <Label text="Buscar producto:"/><TextField fx:id="txtBuscarProducto" promptText="Código o nombre" HBox.hgrow="ALWAYS"/>
+   <Button text="Refrescar catálogo" onAction="#recargarComboProductos"/>
+  </HBox>
+  <HBox spacing="12" alignment="CENTER_LEFT">
+   <ComboBox fx:id="cmbProducto" promptText="Seleccione un producto" prefWidth="370" HBox.hgrow="ALWAYS"/>
+   <Label text="Cantidad:"/><TextField fx:id="txtCantidad" text="1" prefWidth="75"/>
+   <Button text="Agregar" onAction="#agregarAlCarrito"><graphic><ImageView fitWidth="18" fitHeight="18" preserveRatio="true"><image><Image url="@../icons/agregar.png"/></image></ImageView></graphic></Button>
+  </HBox>
+  <Label fx:id="lblStockDisponible" text="Disponibles: -"/>
+  <TableView fx:id="tblDetalle" VBox.vgrow="ALWAYS" minHeight="200">
+   <columns>
+    <TableColumn fx:id="colCodigo" text="Código" prefWidth="110"/>
+    <TableColumn fx:id="colProducto" text="Producto" prefWidth="300"/>
+    <TableColumn fx:id="colCantidad" text="Cantidad" prefWidth="100"/>
+    <TableColumn fx:id="colPrecio" text="Precio" prefWidth="160"/>
+    <TableColumn fx:id="colSubtotal" text="Subtotal" prefWidth="170"/>
+   </columns>
+   <columnResizePolicy><TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/></columnResizePolicy>
+  </TableView>
+  <HBox spacing="20" alignment="TOP_LEFT">
+   <Button text="Quitar seleccionado" onAction="#removerDelCarrito"/>
+   <Region HBox.hgrow="ALWAYS"/>
+   <GridPane hgap="25" vgap="10">
+    <Label text="Subtotal:"/><Label fx:id="lblSubtotal" GridPane.columnIndex="1"/>
+    <Label text="IVA (15 %):" GridPane.rowIndex="1"/><Label fx:id="lblIva" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+    <Label text="Total:" GridPane.rowIndex="2" style="-fx-font-weight: bold;"/>
+    <Label fx:id="lblTotal" GridPane.rowIndex="2" GridPane.columnIndex="1" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
+   </GridPane>
+  </HBox>
+  <HBox spacing="12" alignment="CENTER_RIGHT">
+   <Button text="Cancelar" onAction="#cancelar"/>
+   <Button text="Finalizar venta" onAction="#finalizarVenta"/>
+  </HBox>
+ </VBox></center>
+</BorderPane>
