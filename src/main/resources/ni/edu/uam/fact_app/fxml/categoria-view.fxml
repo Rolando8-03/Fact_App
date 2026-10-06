@@ -56,7 +56,8 @@
       <HBox spacing="10" alignment="CENTER_LEFT">
       <Region HBox.hgrow="ALWAYS"/>
       <Button text="Nuevo" onAction="#limpiar"><tooltip><Tooltip text="Limpiar el formulario para agregar un registro"/></tooltip></Button>
-      <Button text="Eliminar" onAction="#eliminar"/>
+      <Button text="Actualizar" onAction="#actualizar"/>
+        <Button text="Eliminar" onAction="#eliminar"/>
       <Button text="Refrescar" onAction="#refrescar"/>
     </HBox>
       <TableView fx:id="tblCategorias" VBox.vgrow="ALWAYS" minHeight="140">
@@ -72,7 +73,8 @@
           <ContextMenu>
             <items>
         <MenuItem text="Nuevo registro" onAction="#limpiar"/>
-        <MenuItem text="Eliminar seleccionado" onAction="#eliminar"/>
+        <MenuItem text="Actualizar seleccionado" onAction="#actualizar"/>
+            <MenuItem text="Eliminar seleccionado" onAction="#eliminar"/>
         <SeparatorMenuItem/>
         <MenuItem text="Refrescar" onAction="#refrescar"/>
     </items>

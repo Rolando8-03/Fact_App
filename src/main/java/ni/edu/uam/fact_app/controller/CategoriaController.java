@@ -31,6 +31,7 @@ public class CategoriaController {
     private final ObservableList<Categoria> datos = FXCollections.observableArrayList();
     private final FilteredList<Categoria> filtrados = new FilteredList<>(datos, p -> true);
     private Integer idEdicion;
+    private Control campoError;
 
     @FXML private void initialize() {
         colId.setCellValueFactory(new PropertyValueFactory<>("id"));
@@ -61,33 +62,77 @@ public class CategoriaController {
         idEdicion = objeto.getId();
         lblEstado.setText("Editando registro #" + idEdicion);
         txtNombre.setText(objeto.getNombre()); chkActiva.setSelected(objeto.isActiva());
-        btnGuardar.setText("Actualizar");
+        btnGuardar.setDisable(true);
     }
 
-    @FXML private void guardar() {
-        if (txtNombre.getText().isBlank()) {
-            Alertas.mostrar(Alert.AlertType.WARNING, "Debe completar todos los campos obligatorios marcados con *."); return;
-        }
-        try {
 
-            Categoria objeto = new Categoria(idEdicion, txtNombre.getText().trim(), chkActiva.isSelected());
-            if (idEdicion == null) dao.guardar(objeto); else dao.actualizar(objeto);
+    @FXML private void guardar() {
+        if (idEdicion != null) {
+            Alertas.mostrar(Alert.AlertType.WARNING, "Para modificar el registro seleccionado utilice Actualizar. Para agregar otro, pulse Nuevo.");
+            return;
+        }
+        guardarCambios(false);
+    }
+
+    @FXML private void actualizar() {
+        if (!validarSeleccion("actualizar")) return;
+        guardarCambios(true);
+    }
+
+    private boolean validarSeleccion(String operacion) {
+        Categoria seleccion = tblCategorias.getSelectionModel().getSelectedItem();
+        if (seleccion == null || seleccion.getId() == null || !Objects.equals(seleccion.getId(), idEdicion)) {
+            Alertas.mostrar(Alert.AlertType.WARNING, "Debe seleccionar la categoría que desea " + operacion + ".");
+            tblCategorias.requestFocus();
+            return false;
+        }
+        return true;
+    }
+
+    private void guardarCambios(boolean actualizar) {
+        campoError = null;
+        try {
+            Categoria objeto = obtenerCategoriaFormulario();
+            if (dao.existeNombre(objeto.getNombre(), actualizar ? objeto.getId() : null)) {
+                campoError = txtNombre;
+                throw new IllegalArgumentException("Ya existe una categoría con ese nombre.");
+            }
+            if (actualizar) dao.actualizar(objeto); else dao.guardar(objeto);
             limpiar();
-            refrescar();
-            lblEstado.setText("Registro #" + objeto.getId() + " guardado correctamente.");
-        } catch (NumberFormatException e) {
-            Alertas.mostrar(Alert.AlertType.WARNING, "Revise los valores numéricos del formulario.");
+            boolean cargado = cargarDatos();
+            lblEstado.setText("Registro #" + objeto.getId() + (actualizar ? " actualizado." : " guardado.")
+                    + (cargado ? "" : " No se pudo refrescar la tabla; pulse Refrescar."));
+        } catch (IllegalArgumentException e) {
+            Alertas.mostrar(Alert.AlertType.WARNING, e.getMessage());
+            if (campoError != null) campoError.requestFocus();
         } catch (SQLException e) { Alertas.errorBD(e); }
     }
 
+    private Categoria obtenerCategoriaFormulario() {
+        String nombre = txtNombre.getText().trim();
+        if (nombre.isEmpty()) {
+            campoError = txtNombre;
+            throw new IllegalArgumentException("El nombre de la categoría es obligatorio.");
+        }
+        if (nombre.length() > 100) {
+            campoError = txtNombre;
+            throw new IllegalArgumentException("El nombre de la categoría admite hasta 100 caracteres.");
+        }
+        return new Categoria(idEdicion, nombre, chkActiva.isSelected());
+    }
+
     @FXML private void eliminar() {
-        if (idEdicion == null) { Alertas.mostrar(Alert.AlertType.WARNING, "Seleccione un registro de la tabla."); return; }
-        if (!Alertas.confirmar("¿Desea eliminar el registro seleccionado?")) return;
+        if (!validarSeleccion("eliminar")) return;
+        if (!Alertas.confirmar("¿Desea eliminar la categoría seleccionada?")) return;
         try {
+            if (dao.tieneProductos(idEdicion)) {
+                Alertas.mostrar(Alert.AlertType.WARNING, "No puede eliminar la categoría porque tiene productos asociados.");
+                return;
+            }
             dao.eliminar(idEdicion);
             limpiar();
-            refrescar();
-            lblEstado.setText("Registro eliminado correctamente.");
+            boolean cargado = cargarDatos();
+            lblEstado.setText("Registro eliminado." + (cargado ? "" : " No se pudo refrescar la tabla; pulse Refrescar."));
         } catch (SQLException e) { Alertas.errorBD(e); }
     }
 
@@ -95,18 +140,22 @@ public class CategoriaController {
         idEdicion = null;
         tblCategorias.getSelectionModel().clearSelection();
         txtNombre.clear(); chkActiva.setSelected(true);
+        btnGuardar.setDisable(false);
         btnGuardar.setText("Guardar");
         lblEstado.setText("Nuevo registro");
     }
 
-    @FXML private void refrescar() {
+    @FXML private void refrescar() { cargarDatos(); }
+
+    private boolean cargarDatos() {
         try {
             java.util.List<Categoria> nuevos = dao.listar();
             
             limpiar();
             datos.setAll(nuevos);
             filtrar();
-        } catch (SQLException e) { Alertas.errorBD(e); }
+            return true;
+        } catch (SQLException e) { Alertas.errorBD(e); return false; }
     }
 
     private void filtrar() {

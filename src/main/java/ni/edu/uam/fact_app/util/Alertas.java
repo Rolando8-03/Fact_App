@@ -22,6 +22,12 @@ public final class Alertas {
         return alerta.showAndWait().orElse(no) == si;
     }
     public static void errorBD(SQLException e) {
+        System.err.println("Error JDBC [" + e.getSQLState() + "]: " + e.getMessage());
+        mostrar(Alert.AlertType.ERROR, mensajeBD(e));
+    }
+
+    public static String mensajeBD(SQLException e) {
+        if (e instanceof OperacionException) return e.getMessage();
         String estado = e.getSQLState();
         String mensaje;
         if ("23503".equals(estado)) mensaje = "El registro está relacionado con otros datos. Revise la categoría o el cargo; si ya fue utilizado, desactívelo en lugar de eliminarlo.";
@@ -30,7 +36,8 @@ public final class Alertas {
         else if ("22001".equals(estado)) mensaje = "Uno de los textos supera la longitud permitida.";
         else if (estado != null && (estado.startsWith("08") || estado.startsWith("28") || estado.equals("3D000")))
             mensaje = "No se pudo conectar a PostgreSQL. Revise el servicio, la base fact_app y config/database.properties.";
-        else mensaje = "No se completó la operación: " + e.getMessage();
-        mostrar(Alert.AlertType.ERROR, mensaje);
+        else if ("02000".equals(estado)) mensaje = "El registro ya no existe. Pulse Refrescar y vuelva a seleccionar un registro.";
+        else mensaje = "No fue posible completar la operación. Inténtelo nuevamente; si el problema continúa, revise la conexión y la configuración de la base de datos.";
+        return mensaje;
     }
 }

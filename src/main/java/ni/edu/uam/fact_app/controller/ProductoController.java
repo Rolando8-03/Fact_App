@@ -37,6 +37,7 @@ public class ProductoController {
     private final ObservableList<Producto> datos = FXCollections.observableArrayList();
     private final FilteredList<Producto> filtrados = new FilteredList<>(datos, p -> true);
     private Integer idEdicion;
+    private Control campoError;
 
     @FXML private void initialize() {
         colId.setCellValueFactory(new PropertyValueFactory<>("id"));
@@ -74,44 +75,109 @@ public class ProductoController {
         cmbCategoria.setValue(objeto.getCategoria()); chkActivo.setSelected(objeto.isActivo());
         rutaImagen = objeto.getRutaImagen(); mostrarImagen();
 
-        btnGuardar.setText("Actualizar");
+        btnGuardar.setDisable(true);
     }
 
+
     @FXML private void guardar() {
-        if (txtCodigo.getText().isBlank() || txtNombre.getText().isBlank() || txtPrecio.getText().isBlank() || txtExistencia.getText().isBlank() || cmbCategoria.getValue() == null) {
-            Alertas.mostrar(Alert.AlertType.WARNING, "Debe completar todos los campos obligatorios marcados con *."); return;
+        if (idEdicion != null) {
+            Alertas.mostrar(Alert.AlertType.WARNING, "Para modificar el registro seleccionado utilice Actualizar. Para agregar otro, pulse Nuevo.");
+            return;
         }
+        guardarCambios(false);
+    }
+
+    @FXML private void actualizar() {
+        if (!validarSeleccion("actualizar")) return;
+        guardarCambios(true);
+    }
+
+    private boolean validarSeleccion(String operacion) {
+        Producto seleccion = tblProductos.getSelectionModel().getSelectedItem();
+        if (seleccion == null || seleccion.getId() == null || !Objects.equals(seleccion.getId(), idEdicion)) {
+            Alertas.mostrar(Alert.AlertType.WARNING, "Debe seleccionar el producto que desea " + operacion + ".");
+            tblProductos.requestFocus();
+            return false;
+        }
+        return true;
+    }
+
+    private void guardarCambios(boolean actualizar) {
+        campoError = null;
         try {
-
-            java.math.BigDecimal precio = new java.math.BigDecimal(txtPrecio.getText().trim().replace(',', '.'));
-            int existencia = Integer.parseInt(txtExistencia.getText().trim());
-            if (precio.signum() <= 0 || existencia < 0 || precio.compareTo(new java.math.BigDecimal("9999999999.99")) > 0) {
-                Alertas.mostrar(Alert.AlertType.WARNING, "El precio debe ser mayor que cero (máximo 9,999,999,999.99) y la existencia no negativa."); return;
+            Producto objeto = obtenerProductoFormulario();
+            if (dao.existeCodigo(objeto.getCodigo(), actualizar ? objeto.getId() : null)) {
+                campoError = txtCodigo;
+                throw new IllegalArgumentException("Ya existe un producto con ese código.");
             }
-            try { precio = precio.setScale(2, java.math.RoundingMode.UNNECESSARY); }
-            catch (ArithmeticException e) { Alertas.mostrar(Alert.AlertType.WARNING, "Ingrese un precio con un máximo de dos decimales."); return; }
-            if (!cmbCategoria.getValue().isActiva() && (idEdicion == null || datos.stream().noneMatch(p -> Objects.equals(p.getId(), idEdicion) && Objects.equals(p.getCategoria().getId(), cmbCategoria.getValue().getId())))) {
-                Alertas.mostrar(Alert.AlertType.WARNING, "Seleccione una categoría activa para un producto nuevo o un cambio de categoría."); return;
-            }
-
-            Producto objeto = new Producto(idEdicion, txtCodigo.getText().trim(), txtNombre.getText().trim(), cmbCategoria.getValue(), precio, existencia, rutaImagen, chkActivo.isSelected());
-            if (idEdicion == null) dao.guardar(objeto); else dao.actualizar(objeto);
+            if (actualizar) dao.actualizar(objeto); else dao.guardar(objeto);
             limpiar();
-            refrescar();
-            lblEstado.setText("Registro #" + objeto.getId() + " guardado correctamente.");
-        } catch (NumberFormatException e) {
-            Alertas.mostrar(Alert.AlertType.WARNING, "Revise los valores numéricos del formulario.");
+            boolean cargado = cargarDatos();
+            lblEstado.setText("Registro #" + objeto.getId() + (actualizar ? " actualizado." : " guardado.")
+                    + (cargado ? "" : " No se pudo refrescar la tabla; pulse Refrescar."));
+        } catch (IllegalArgumentException e) {
+            Alertas.mostrar(Alert.AlertType.WARNING, e.getMessage());
+            if (campoError != null) campoError.requestFocus();
         } catch (SQLException e) { Alertas.errorBD(e); }
     }
 
-    @FXML private void eliminar() {
-        if (idEdicion == null) { Alertas.mostrar(Alert.AlertType.WARNING, "Seleccione un registro de la tabla."); return; }
-        if (!Alertas.confirmar("¿Desea eliminar el registro seleccionado?")) return;
+    private Producto obtenerProductoFormulario() {
+        String codigo = txtCodigo.getText().trim();
+        String nombre = txtNombre.getText().trim();
+        campoError = txtCodigo;
+        if (codigo.isEmpty()) throw new IllegalArgumentException("El código del producto es obligatorio.");
+        if (codigo.length() > 50) throw new IllegalArgumentException("El código admite hasta 50 caracteres.");
+        campoError = txtNombre;
+        if (nombre.isEmpty()) throw new IllegalArgumentException("El nombre del producto es obligatorio.");
+        if (nombre.length() > 150) throw new IllegalArgumentException("El nombre del producto admite hasta 150 caracteres.");
+        campoError = cmbCategoria;
+        Categoria categoria = cmbCategoria.getValue();
+        if (categoria == null || categoria.getId() == null)
+            throw new IllegalArgumentException("Debe seleccionar una categoría.");
+        if (!categoria.isActiva() && (idEdicion == null || datos.stream().noneMatch(p ->
+                Objects.equals(p.getId(), idEdicion) && Objects.equals(p.getCategoria().getId(), categoria.getId()))))
+            throw new IllegalArgumentException("Seleccione una categoría activa para un producto nuevo o un cambio de categoría.");
+
+        campoError = txtPrecio;
+        java.math.BigDecimal precio;
         try {
+            precio = new java.math.BigDecimal(txtPrecio.getText().trim().replace(',', '.'));
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("El precio debe ser un valor numérico.", e);
+        }
+        if (precio.signum() <= 0) throw new IllegalArgumentException("El precio de venta debe ser mayor que cero.");
+        if (precio.compareTo(new java.math.BigDecimal("9999999999.99")) > 0)
+            throw new IllegalArgumentException("El precio no puede superar 9,999,999,999.99.");
+        try {
+            precio = precio.setScale(2, java.math.RoundingMode.UNNECESSARY);
+        } catch (ArithmeticException e) {
+            throw new IllegalArgumentException("El precio admite un máximo de dos decimales.", e);
+        }
+
+        campoError = txtExistencia;
+        int existencia;
+        try {
+            existencia = Integer.parseInt(txtExistencia.getText().trim());
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("La existencia debe ser un número entero entre 0 y 2147483647.", e);
+        }
+        if (existencia < 0) throw new IllegalArgumentException("La existencia no puede ser negativa.");
+        campoError = null;
+        return new Producto(idEdicion, codigo, nombre, categoria, precio, existencia, rutaImagen, chkActivo.isSelected());
+    }
+
+    @FXML private void eliminar() {
+        if (!validarSeleccion("eliminar")) return;
+        if (!Alertas.confirmar("¿Desea eliminar el producto seleccionado?")) return;
+        try {
+            if (dao.tieneVentas(idEdicion)) {
+                Alertas.mostrar(Alert.AlertType.WARNING, "No puede eliminar el producto porque está asociado a ventas. Puede desactivarlo.");
+                return;
+            }
             dao.eliminar(idEdicion);
             limpiar();
-            refrescar();
-            lblEstado.setText("Registro eliminado correctamente.");
+            boolean cargado = cargarDatos();
+            lblEstado.setText("Registro eliminado." + (cargado ? "" : " No se pudo refrescar la tabla; pulse Refrescar."));
         } catch (SQLException e) { Alertas.errorBD(e); }
     }
 
@@ -119,11 +185,14 @@ public class ProductoController {
         idEdicion = null;
         tblProductos.getSelectionModel().clearSelection();
         txtCodigo.clear(); txtNombre.clear(); txtPrecio.clear(); txtExistencia.clear(); cmbCategoria.setValue(null); chkActivo.setSelected(true); imgProducto.setImage(null); rutaImagen = null;
+        btnGuardar.setDisable(false);
         btnGuardar.setText("Guardar");
         lblEstado.setText("Nuevo registro");
     }
 
-    @FXML private void refrescar() {
+    @FXML private void refrescar() { cargarDatos(); }
+
+    private boolean cargarDatos() {
         try {
             java.util.List<Producto> nuevos = dao.listar();
             
@@ -141,7 +210,8 @@ public class ProductoController {
             limpiar();
             datos.setAll(nuevos);
             filtrar();
-        } catch (SQLException e) { Alertas.errorBD(e); }
+            return true;
+        } catch (SQLException e) { Alertas.errorBD(e); return false; }
     }
 
     private void filtrar() {

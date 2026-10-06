@@ -31,12 +31,14 @@ public class ProductoDAO {
     }
 
     public void actualizar(Producto objeto) throws SQLException {
+        if (objeto == null || objeto.getId() == null)
+            throw new IllegalArgumentException("Debe seleccionar el registro que desea actualizar.");
         String sql = "UPDATE producto SET codigo = ?, nombre = ?, categoria_id = ?, precio_venta = ?, existencia = ?, ruta_imagen = ?, activo = ? WHERE id = ?";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             parametros(ps, objeto);
             ps.setInt(8, objeto.getId());
-            if (ps.executeUpdate() != 1) throw new SQLException("El registro ya no existe. Pulse Refrescar.");
+            if (ps.executeUpdate() != 1) throw new SQLException("El registro ya no existe. Pulse Refrescar.", "02000");
         }
     }
 
@@ -44,7 +46,36 @@ public class ProductoDAO {
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement("DELETE FROM producto WHERE id = ?")) {
             ps.setInt(1, id);
-            if (ps.executeUpdate() != 1) throw new SQLException("El registro ya no existe. Pulse Refrescar.");
+            if (ps.executeUpdate() != 1) throw new SQLException("El registro ya no existe. Pulse Refrescar.", "02000");
+        }
+    }
+
+
+    public boolean existeCodigo(String valor) throws SQLException {
+        return existeCodigo(valor, null);
+    }
+
+    public boolean existeCodigo(String valor, Integer idExcluir) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM producto WHERE LOWER(TRIM(codigo)) = LOWER(TRIM(?))";
+        if (idExcluir != null) sql += " AND id <> ?";
+        try (Connection cn = DatabaseConnection.getConnection();
+             PreparedStatement ps = cn.prepareStatement(sql)) {
+            ps.setString(1, valor.trim());
+            if (idExcluir != null) ps.setInt(2, idExcluir);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next() && rs.getInt(1) > 0;
+            }
+        }
+    }
+
+    public boolean tieneVentas(int id) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM detalle_venta WHERE producto_id = ?";
+        try (Connection cn = DatabaseConnection.getConnection();
+             PreparedStatement ps = cn.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next() && rs.getInt(1) > 0;
+            }
         }
     }
 
